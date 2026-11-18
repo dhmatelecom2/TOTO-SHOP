@@ -1,5 +1,5 @@
 name = "toto-shop"
-main = "index.js"
+main = "worker/index.js"
 compatibility_date = "2026-10-01"
 
 [assets]
