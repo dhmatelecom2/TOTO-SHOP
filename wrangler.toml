@@ -1,0 +1,16 @@
+name = "toto-shop"
+main = "worker/index.js"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "toto-shop-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[vars]
+SHOP_NAME = "TOTO SHOP"
+CURRENCY = "BDT"
