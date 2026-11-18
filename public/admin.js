@@ -1,5 +1,13 @@
-const $=s=>document.querySelector(s);
-const api=async(path,opts={})=>{const r=await fetch(path,{headers:{"Content-Type":"application/json"},...opts});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"সমস্যা হয়েছে");return d};
+const api=async(path,opts={})=>{
+const r=await fetch(path,{
+credentials:"include",
+headers:{"Content-Type":"application/json",...(opts.headers||{})},
+...opts
+});
+const d=await r.json().catch(()=>({}));
+if(!r.ok)throw Error(d.error||"সমস্যা হয়েছে");
+return d;
+};
 const fmt=n=>"৳"+Number(n||0).toLocaleString("bn-BD");
 const statusLabel={pending:"অপেক্ষমাণ",confirmed:"নিশ্চিত",processing:"প্রস্তুত হচ্ছে",shipped:"পথে আছে",delivered:"ডেলিভারি সম্পন্ন",cancelled:"বাতিল",unpaid:"পেমেন্ট বাকি",submitted:"পেমেন্ট জমা",paid:"পেইড",rejected:"রিজেক্ট"};
 let products=[],orders=[];
