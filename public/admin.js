@@ -14,7 +14,34 @@ let products=[],orders=[];
 function toast(s){$("#toast").textContent=s;$("#toast").classList.add("show");setTimeout(()=>$("#toast").classList.remove("show"),2200)}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 async function checkLogin(){try{await api("/api/admin/me");$("#loginScreen").hidden=true;$("#adminApp").hidden=false;loadAll()}catch{}}
-$("#loginForm").onsubmit=async e=>{e.preventDefault();try{await api("/api/admin/login",{method:"POST",body:JSON.stringify({password:new FormData(e.target).get("password")})});$("#loginScreen").hidden=true;$("#adminApp").hidden=false;loadAll()}catch(err){$("#loginError").textContent=err.message}};
+$("#loginForm").onsubmit=async e=>{
+e.preventDefault();
+const error=$("#loginError");
+error.textContent="";
+
+try{
+await api("/api/admin/login",{
+method:"POST",
+body:JSON.stringify({
+password:new FormData(e.target).get("password")
+})
+});
+
+await api("/api/admin/me");
+
+$("#loginScreen").hidden=true;
+$("#adminApp").hidden=false;
+
+try{
+await loadAll();
+}catch(err){
+toast("ডাটা লোড হয়নি: "+err.message);
+}
+
+}catch(err){
+error.textContent=err.message;
+}
+};
 $("#logout").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});location.reload()};
 async function loadAll(){await Promise.all([loadProducts(),loadOrders(),loadSettings()]);renderOverview()}
 function showTab(tab){document.querySelectorAll(".tab").forEach(x=>x.hidden=true);$("#tab-"+tab).hidden=false;document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));const titles={overview:"ড্যাশবোর্ড",products:"পণ্য ম্যানেজ",orders:"অর্ডার ম্যানেজ",settings:"সেটিংস"};$("#pageTitle").textContent=titles[tab];$("#currentSection").textContent=tab.toUpperCase()}
