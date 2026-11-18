@@ -1,0 +1,24 @@
+TOTO SHOP — CUSTOMER ACCOUNT আপগ্রেড
+
+আপনার চালু দোকানের Database অক্ষত রেখে Customer Account চালু করার ধাপ:
+
+১) আগে ZIP Extract করুন।
+২) Cloudflare Dashboard → D1 → toto-shop-db → Console খুলুন।
+৩) ZIP-এর customer-account-migration.sql ফাইল খুলে সম্পূর্ণ SQL কপি করে Console-এ একবার Run করুন। সফল হলে customers, customer_sessions টেবিল এবং orders.customer_id কলাম তৈরি হবে।
+৪) GitHub রিপোজিটরিতে worker/index.js এবং public ফোল্ডারের নতুন ফাইলগুলো আপলোড/Replace করুন।
+৫) আপনার আগের wrangler.toml ফাইলটি রেখে দিন। বিশেষ করে database_id, DB binding এবং ASSETS binding পরিবর্তন করবেন না।
+৬) Cloudflare Worker Deploy করুন। ADMIN_PASSWORD ও SESSION_SECRET আগের মতোই রাখুন।
+৭) ওয়েবসাইট খুলে “আমার অ্যাকাউন্ট” → “নতুন অ্যাকাউন্ট” থেকে পরীক্ষা করুন। এরপর লগইন অবস্থায় একটি অর্ডার করলে সেটি Account → Order History-তে দেখা যাবে।
+
+নতুন API:
+POST /api/customer/register
+POST /api/customer/login
+POST /api/customer/logout
+GET  /api/customer/me
+GET  /api/customer/orders
+
+নোট:
+- পুরোনো Admin Panel, Admin Login, Product, Settings, Orders এবং Guest Checkout রুট রাখা হয়েছে।
+- পুরোনো অর্ডার ডিলিট হবে না; পুরোনো Guest Order আগের Order Tracking দিয়ে দেখা যাবে।
+- নতুন অ্যাকাউন্টে লগইন করে দেওয়া অর্ডারগুলো Order History-তে যুক্ত হবে।
+- এই সংস্করণে SMS/OTP ফোন ভেরিফিকেশন নেই।

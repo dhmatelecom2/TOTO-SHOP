@@ -51,3 +51,23 @@ Cloudflare Dashboard → Workers & Pages → `toto-shop` Worker (প্রথম
 
 ## সীমাবদ্ধতা
 এই starter-এ customer account, image upload storage, automated SMS, courier API বা automatic bKash/Nagad gateway নেই। পণ্যের ছবি public image URL দিয়ে দিতে হয়। Production-এ ব্যবহারের আগে test order, database backup এবং security review করুন।
+
+## Customer Account upgrade (existing live shop)
+
+This version adds customer registration/login/profile/order history while keeping the existing admin routes and guest checkout. Customer accounts use a separate `toto_customer` HttpOnly cookie and do not share the admin session.
+
+### IMPORTANT — existing D1 database
+
+If `toto-shop-db` is already in use, **do not run the full `schema.sql` again as an upgrade step**. First open Cloudflare Dashboard → D1 → `toto-shop-db` → Console and run the complete contents of `customer-account-migration.sql` exactly once. This creates `customers` and `customer_sessions` and adds the nullable `customer_id` column/index to the existing `orders` table. Existing products, settings, orders and admin settings are not deleted.
+
+After the migration succeeds, deploy the updated `worker/index.js` and upload the updated `public/` files. Keep the `database_id` in your currently working `wrangler.toml`; do not replace it with the placeholder from a sample config. Keep existing `DB` and `ASSETS` bindings and existing `ADMIN_PASSWORD` / `SESSION_SECRET` secrets.
+
+### New customer API routes
+
+- `POST /api/customer/register` — `{name, phone, address, password}`; password must be at least 8 characters.
+- `POST /api/customer/login` — `{phone, password}`.
+- `POST /api/customer/logout` — ends the customer session.
+- `GET /api/customer/me` — returns the signed-in customer's profile.
+- `GET /api/customer/orders` — returns only the signed-in customer's latest 100 orders.
+
+Orders submitted while a customer is signed in are linked to that customer. Guest checkout and the existing `/api/track` route remain available. Existing guest orders are not automatically assigned to a new account. Phone-number ownership is not verified by SMS/OTP in this version; users should register with a phone number they control.
